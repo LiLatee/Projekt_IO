@@ -109,11 +109,10 @@ namespace IO_projekt
             var tasks = new List<Task>();
             for (int j = 1; j < randomImage.Height - 2; j++)
             {
-                Task<int> temp = ciach0(j);
-                tasks.Add(temp);
+                tasks.Add(ciach0(j));
             }
-            await Task.WhenAll(tasks);
 
+            await Task.WhenAll(tasks.ToArray());
             stopwatch.Stop();
 
             textBlock_asynchronous_time.Text = (stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s";
@@ -122,9 +121,9 @@ namespace IO_projekt
 
         }
 
-        private Task<int> ciach0(int j)
-        {            
-            return Task<int>.Factory.StartNew(() =>
+        private Task ciach0(int j)
+        {
+            return Task.Factory.StartNew(() =>
             {
                 for (int k = 0; k < count_of_iterations; k++)
                 for (int i = 1; i < randomImage.Width - 1; i++)
@@ -134,8 +133,8 @@ namespace IO_projekt
 
                     randomImage[i, j] = new Gray(newValue);
                 }
-                return 0;
             });
+
         }
     }
 }
