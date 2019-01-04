@@ -7,11 +7,16 @@ using System.Threading.Tasks;
 using Emgu.CV;
 using Emgu.CV.Structure;
 
-namespace IO_projekt
+namespace IO_projekt 
 {
-    class MyImage
+    class MyImage : ICloneable
     {
         public double[,] pixels;
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
 
         public MyImage(int width, int height)
         {
@@ -35,10 +40,10 @@ namespace IO_projekt
         {
             pixels = new double[width+2, height+2];
             Random rnd = new Random();
-            for (int i = 1; i < width-1; i++)
+            for (int i = 1; i < width - 1; i++)
             for (int j = 1; j < height - 1; j++)
                 pixels[i, j] = rnd.Next(0, 255);
-                //pixels[i, j] = 0;
+                //pixels[i, j] = 255;
         }
 
         public Image<Gray, Byte> toImage()
@@ -76,23 +81,24 @@ namespace IO_projekt
             var stream = File.Open(path, FileMode.OpenOrCreate);
 
             StringBuilder sb = new StringBuilder();
-            sb = sb.Append("P5\n");
+            sb = sb.Append("P2\n");
             sb = sb.Append(pixels.GetLength(0)-2);
             sb = sb.Append(" ");
             sb = sb.Append(pixels.GetLength(1)-2);
             sb = sb.Append("\n");
             sb = sb.Append("255\n");
-            for (int i = 0; i < pixels.GetLength(0) - 2; i++)
+            for (int i = 1; i < pixels.GetLength(0) - 2; i++)
             {
-                for (int j = 0; j < pixels.GetLength(1) - 2; j++)
+                for (int j = 1; j < pixels.GetLength(1) - 2; j++)
                 {
-                    if (pixels[i,j] - (int)pixels[i,j] < 0.5)
+                    /*if (pixels[i,j] - (int)pixels[i,j] < 0.5)
                         sb = sb.Append((int)pixels[i, j]);
                     else
-                        sb = sb.Append((int)pixels[i, j] + 1);
-                    //sb = sb.Append(" ");
+                        sb = sb.Append((int)pixels[i, j] + 1);*/
+                    sb = sb.Append(Math.Floor(pixels[i, j]));
+                    sb = sb.Append(" ");
                 }
-               //sb = sb.Append("\n");
+               sb = sb.Append("\n");
 
             }
 

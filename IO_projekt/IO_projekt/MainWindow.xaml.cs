@@ -26,7 +26,7 @@ namespace IO_projekt
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MyImage randomImage, workingImage;
+        private MyImage randomImage, workingImage, tempImage;
         private int countOfIterations;
         public MainWindow()
         {
@@ -49,6 +49,8 @@ namespace IO_projekt
         private void button_start_Click(object sender, RoutedEventArgs e)
         {
             workingImage = new MyImage(randomImage);
+            tempImage = new MyImage(randomImage);
+
             // int[,] g = new int[randomImage,1024];
             // Array.Copy(randomImage.pixels, 0, g, 0, randomImage.pixels.Length);
 
@@ -58,13 +60,16 @@ namespace IO_projekt
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             for (int k = 0;k<countOfIterations;k++ )
-            for (int i = 1; i < workingImage.pixels.GetLength(0)-1; i++)
-            for (int j = 1; j < workingImage.pixels.GetLength(1) -1; j++)
             {
-                double newValue = workingImage.pixels[i, j] * 0.6 + workingImage.pixels[i, j - 1] * 0.1 + workingImage.pixels[i, j + 1] * 0.1 +
-                                  workingImage.pixels[i - 1, j] * 0.1 + workingImage.pixels[i + 1, j] * 0.1;
+                for (int i = 1; i < workingImage.pixels.GetLength(0)-1; i++)
+                for (int j = 1; j < workingImage.pixels.GetLength(1) -1; j++)
+                {
+                    double newValue = workingImage.pixels[i, j] * 0.6 + workingImage.pixels[i, j - 1] * 0.1 + workingImage.pixels[i, j + 1] * 0.1 +
+                                      workingImage.pixels[i - 1, j] * 0.1 + workingImage.pixels[i + 1, j] * 0.1;
 
-                workingImage.pixels[i, j] = newValue;
+                    tempImage.pixels[i, j] = newValue;
+                }
+                workingImage = new MyImage(tempImage);
             }
             stopwatch.Stop();
             textBlock_synchronous_time.Text = (stopwatch.ElapsedMilliseconds/1000.0).ToString() + " s";
@@ -108,6 +113,8 @@ namespace IO_projekt
             countOfIterations = Int32.Parse(textBox_iterations.Text);
             int tasksCount = Int32.Parse(textBox_tasksCount.Text);
             workingImage = new MyImage(randomImage);
+            tempImage = new MyImage(randomImage);
+
             int mod = (workingImage.pixels.GetLength(1)-2) % tasksCount;
             int howManyRows = (workingImage.pixels.GetLength(1)-2) / tasksCount;
 
@@ -115,15 +122,20 @@ namespace IO_projekt
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             var tasks = new List<Task>();
-            for (int j = 0; j < tasksCount; j++)
+            for (int k = 0; k < countOfIterations; k++)
             {
-                if (j == tasksCount-1 && mod != 0)
-                    tasks.Add(ciach1(j * howManyRows + 1, howManyRows + mod));
+                for (int j = 0; j < tasksCount; j++)
+                {
+                    if (j == tasksCount-1 && mod != 0)
+                        tasks.Add(ciach1(j * howManyRows + 1, howManyRows + mod));
 
-                else
-                    tasks.Add(ciach1(j*howManyRows + 1, howManyRows));
+                    else
+                        tasks.Add(ciach1(j*howManyRows + 1, howManyRows));
+                }
+                await Task.WhenAll(tasks.ToArray());
+                workingImage = new MyImage(tempImage);
             }
-            await Task.WhenAll(tasks.ToArray());
+
             stopwatch.Stop();
 
             textBlock_asynchronous_time.Text = (stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s";
@@ -153,18 +165,17 @@ namespace IO_projekt
         {
             return Task.Factory.StartNew(() =>
             {
-                for (int k = 0; k < countOfIterations; k++)
                 for (int h = j; h < j+howManyRows && h < workingImage.pixels.GetLength(0) - 1; h++ )
                 for (int i = 1; i < workingImage.pixels.GetLength(0) - 1; i++)
                 {
-                    double newValue = workingImage.pixels[i, h] * 0.6 + workingImage.pixels[i, h - 1] * 0.1 + workingImage.pixels[i, h + 1] * 0.1 +
-                                      workingImage.pixels[i - 1, h] * 0.1 + workingImage.pixels[i + 1, h] * 0.1;
+                    double newValue = workingImage.pixels[i, h] * 0.6f + workingImage.pixels[i, h - 1] * 0.1f + workingImage.pixels[i, h + 1] * 0.1f +
+                                      workingImage.pixels[i - 1, h] * 0.1f + workingImage.pixels[i + 1, h] * 0.1f;
 
-                    workingImage.pixels[i, h] = newValue;
+                    tempImage.pixels[i, h] = newValue;
 
                 }
             });
-
+        
         }
 
         private void button_GenerateImage_Click(object sender, RoutedEventArgs e)
