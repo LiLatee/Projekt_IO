@@ -26,12 +26,12 @@ namespace IO_projekt
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Image<Gray, Byte> randomImage;
-        private int count_of_iterations;
+        private MyImage randomImage, workingImage;
+        private int countOfIterations;
         public MainWindow()
         {
             InitializeComponent();
-
+            generateImage();
         }
 
         private void generateImage()
@@ -40,38 +40,41 @@ namespace IO_projekt
             int width = Int32.Parse(textBox_width.Text);
             int height = Int32.Parse(textBox_height.Text);
 
-            count_of_iterations = Int32.Parse(textBox_iterations.Text);
+            randomImage = new MyImage(width, height);
+            imageBox_generated.Source = BitmapSourceConvert.ToBitmapSource(randomImage.toImage());
+            //randomImage.toImage().Save("generated_image.pgm");
+            randomImage.saveAsPGM("generatedImage.pgm");
 
-            randomImage = new Image<Gray, Byte>(width, height);
-
-            Random rnd = new Random();
-            for (int i = 0; i < randomImage.Width; i++)
-            for (int j = 0; j < randomImage.Height; j++)
-            {
-                randomImage[i, j] = new Gray(rnd.Next(0, 255));
-            }
-            imageBox_generated.Source = BitmapSourceConvert.ToBitmapSource(randomImage);
-            randomImage.Save("generated_image.png");
         }
         private void button_start_Click(object sender, RoutedEventArgs e)
         {
-            generateImage();
+            workingImage = new MyImage(randomImage);
+            // int[,] g = new int[randomImage,1024];
+            // Array.Copy(randomImage.pixels, 0, g, 0, randomImage.pixels.Length);
+
+            countOfIterations = Int32.Parse(textBox_iterations.Text);
+
             //convolution
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            for (int k = 0;k<count_of_iterations;k++ )
-            for (int i = 1; i < randomImage.Width-1; i++)
-            for (int j = 1; j < randomImage.Height-1; j++)
+            for (int k = 0;k<countOfIterations;k++ )
+            for (int i = 1; i < workingImage.pixels.GetLength(0)-1; i++)
+            for (int j = 1; j < workingImage.pixels.GetLength(1) -1; j++)
             {
-                double newValue = randomImage[i, j].Intensity * 0.6 + randomImage[i, j - 1].Intensity * 0.1 + randomImage[i, j + 1].Intensity * 0.1 +
-                                  randomImage[i - 1, j].Intensity * 0.1 + randomImage[i + 1, j].Intensity * 0.1;
+                double newValue = workingImage.pixels[i, j] * 0.6 + workingImage.pixels[i, j - 1] * 0.1 + workingImage.pixels[i, j + 1] * 0.1 +
+                                  workingImage.pixels[i - 1, j] * 0.1 + workingImage.pixels[i + 1, j] * 0.1;
 
-                randomImage[i, j] = new Gray(newValue);
-                    }
+                workingImage.pixels[i, j] = newValue;
+            }
             stopwatch.Stop();
             textBlock_synchronous_time.Text = (stopwatch.ElapsedMilliseconds/1000.0).ToString() + " s";
-            imageBox_after_convolution.Source = BitmapSourceConvert.ToBitmapSource(randomImage);
-            randomImage.Save("image_after_convolution.png");
+            imageBox_after_convolution.Source = BitmapSourceConvert.ToBitmapSource(workingImage.toImage());
+            //workingImage.toImage().Save("image_after_synchronous.pgm");
+            workingImage.saveAsPGM("image_after_synchronous.pgm");
+
+
+
+
 
 
         }
@@ -102,22 +105,31 @@ namespace IO_projekt
 
         private async void  button_Start2_Click(object sender, RoutedEventArgs e)
         {
-            generateImage();
+            countOfIterations = Int32.Parse(textBox_iterations.Text);
+            int tasksCount = Int32.Parse(textBox_tasksCount.Text);
+            workingImage = new MyImage(randomImage);
+            int mod = (workingImage.pixels.GetLength(1)-2) % tasksCount;
+            int howManyRows = (workingImage.pixels.GetLength(1)-2) / tasksCount;
+
             //convolution
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             var tasks = new List<Task>();
-            for (int j = 1; j < randomImage.Height - 2; j++)
+            for (int j = 0; j < tasksCount; j++)
             {
-                tasks.Add(ciach0(j));
-            }
+                if (j == tasksCount-1 && mod != 0)
+                    tasks.Add(ciach1(j * howManyRows + 1, howManyRows + mod));
 
+                else
+                    tasks.Add(ciach1(j*howManyRows + 1, howManyRows));
+            }
             await Task.WhenAll(tasks.ToArray());
             stopwatch.Stop();
 
             textBlock_asynchronous_time.Text = (stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s";
-            imageBox_after_convolution.Source = BitmapSourceConvert.ToBitmapSource(randomImage);
-            randomImage.Save("image_after_convolution.png");
+            imageBox_after_convolution.Source = BitmapSourceConvert.ToBitmapSource(workingImage.toImage());
+            //workingImage.toImage().Save("image_after_asynchronous.pgm");
+            workingImage.saveAsPGM("image_after_asynchronous.pgm");
 
         }
 
@@ -125,16 +137,39 @@ namespace IO_projekt
         {
             return Task.Factory.StartNew(() =>
             {
-                for (int k = 0; k < count_of_iterations; k++)
-                for (int i = 1; i < randomImage.Width - 1; i++)
+                for (int k = 0; k < countOfIterations; k++)
+                for (int i = 1; i < workingImage.pixels.GetLength(0) - 1; i++)
                 {
-                    double newValue = randomImage[i, j].Intensity * 0.6 + randomImage[i, j - 1].Intensity * 0.1 + randomImage[i, j + 1].Intensity * 0.1 +
-                                      randomImage[i - 1, j].Intensity * 0.1 + randomImage[i + 1, j].Intensity * 0.1;
+                    double newValue = workingImage.pixels[i, j] * 0.6 + workingImage.pixels[i, j - 1] * 0.1 + workingImage.pixels[i, j + 1] * 0.1 +
+                                      workingImage.pixels[i - 1, j] * 0.1 + workingImage.pixels[i + 1, j] * 0.1;
 
-                    randomImage[i, j] = new Gray(newValue);
+                    workingImage.pixels[i, j] = newValue;
                 }
             });
 
+        }
+
+        private Task ciach1(int j, int howManyRows)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                for (int k = 0; k < countOfIterations; k++)
+                for (int h = j; h < j+howManyRows && h < workingImage.pixels.GetLength(0) - 1; h++ )
+                for (int i = 1; i < workingImage.pixels.GetLength(0) - 1; i++)
+                {
+                    double newValue = workingImage.pixels[i, h] * 0.6 + workingImage.pixels[i, h - 1] * 0.1 + workingImage.pixels[i, h + 1] * 0.1 +
+                                      workingImage.pixels[i - 1, h] * 0.1 + workingImage.pixels[i + 1, h] * 0.1;
+
+                    workingImage.pixels[i, h] = newValue;
+
+                }
+            });
+
+        }
+
+        private void button_GenerateImage_Click(object sender, RoutedEventArgs e)
+        {
+            generateImage();
         }
     }
 }
