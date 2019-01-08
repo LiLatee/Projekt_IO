@@ -9,14 +9,10 @@ using Emgu.CV.Structure;
 
 namespace IO_projekt 
 {
-    class MyImage : ICloneable
+    class MyImage
     {
         public double[,] pixels;
 
-        public object Clone()
-        {
-            return this.MemberwiseClone();
-        }
 
         public MyImage(int width, int height)
         {

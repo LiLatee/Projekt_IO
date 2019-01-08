@@ -76,12 +76,6 @@ namespace IO_projekt
             imageBox_after_convolution.Source = BitmapSourceConvert.ToBitmapSource(workingImage.toImage());
             //workingImage.toImage().Save("image_after_synchronous.pgm");
             workingImage.saveAsPGM("image_after_synchronous.pgm");
-
-
-
-
-
-
         }
 
         public static class BitmapSourceConvert
