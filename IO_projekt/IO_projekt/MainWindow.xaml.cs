@@ -18,7 +18,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Emgu.CV;
 using Emgu.CV.Structure;
-
+// zmiana indeksów w wykonaniu pętli
+// rozdzielenie operacji na dwie osobne pętle
+// użycie float zamiast double
 namespace IO_projekt
 {
     /// <summary>
@@ -27,6 +29,8 @@ namespace IO_projekt
     public partial class MainWindow : Window
     {
         private MyImage randomImage, workingImage;
+        public float[,] workingImage2;
+
         private int countOfIterations;
         private int width, height;
         private float[,] tempImage;
@@ -106,7 +110,7 @@ namespace IO_projekt
             int tasksCount = 8;
             workingImage = new MyImage(randomImage);
             tempImage = new float[width + 2, height + 2];
-
+            workingImage2 = workingImage.pixels;
             int mod = (workingImage.pixels.GetLength(1) - 2) % tasksCount;
             int howManyRows = (workingImage.pixels.GetLength(1) - 2) / tasksCount;
 
@@ -114,22 +118,23 @@ namespace IO_projekt
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             var tasks = new List<Task>();
-            for (int k = 0; k < countOfIterations; k++)
+
+           for (int k = 0; k < countOfIterations; k++)
             {
                 for (int j = 0; j < tasksCount; j++)
                 {
                     if (j == tasksCount - 1 && mod != 0)
                         tasks.Add(ciach1(j * howManyRows + 1, howManyRows + mod));
-
                     else
                         tasks.Add(ciach1(j * howManyRows + 1, howManyRows));
                 }
                 await Task.WhenAll(tasks.ToArray());
-                workingImage.pixels = tempImage;
+                workingImage2 = tempImage;
+
             }
             stopwatch.Stop();
             Console.WriteLine((stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s");
-
+            workingImage.pixels = workingImage2;
             textBlock_asynchronous_time.Text = (stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s";
             imageBox_after_convolution.Source = BitmapSourceConvert.ToBitmapSource(workingImage.toImage());
             //workingImage.toImage().Save("image_after_asynchronous.pgm");
@@ -137,18 +142,49 @@ namespace IO_projekt
 
         }
 
+        private Task ciach2(int j, int howManyRows)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+
+
+                for (int h = j; h < j + howManyRows && h < workingImage.pixels.GetLength(0) - 1; h++)
+                {
+                    for (int i = 1; i < workingImage.pixels.GetLength(0) - 1; i++)
+                    {
+                        float newValue = workingImage.pixels[i, h] * 0.6f +
+                                         (workingImage.pixels[i, h - 1] + workingImage.pixels[i - 1, h] +
+                                          workingImage.pixels[i + 1, h] + workingImage.pixels[i, h + 1]) * 0.1f;
+
+                        tempImage[i, h] = newValue;
+
+                    }
+                }
+            });
+
+        }
+
+
         private Task ciach1(int j, int howManyRows)
         {
             return Task.Factory.StartNew(() =>
             {
-                for (int h = j; h < j + howManyRows && h < workingImage.pixels.GetLength(0) - 1; h++)
-                for (int i = 1; i < workingImage.pixels.GetLength(0) - 1; i++)
+                float[] newValue = new float[1024];
+                int i;
+                for (int h = j; h < j + howManyRows && h < 1026 - 1; h++)
                 {
-                    float newValue = workingImage.pixels[i, h] * 0.6f +
-                                     (workingImage.pixels[i, h - 1] + workingImage.pixels[i - 1, h] +
-                                      workingImage.pixels[i + 1, h] + workingImage.pixels[i, h + 1]) * 0.1f;
+                    
+                    for (i = 1; i < 1026 - 1; i++)
+                    {
+                        newValue[i-1] = workingImage2[h, i] * 0.6f + (workingImage2[h-1, i] + workingImage2[h,i - 1] +
+                                          workingImage2[h,i + 1] + workingImage2[ h + 1,i]) * 0.1f;                       
+                    }
 
-                    tempImage[i, h] = newValue;
+                    for (i = 1; i < 1026 - 1; i++)
+                    {
+                        tempImage[h, i] = newValue[i-1];
+                    }
+
 
                 }
             });
