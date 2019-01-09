@@ -8,11 +8,15 @@ using System.Threading.Tasks;
 using Emgu.CV;
 using Emgu.CV.Structure;
 
+// zastosowanie tasków 
+// float zamiast double
+// tablice statyczne
+
 namespace IO_projekt 
 {
     class MyImage : ICloneable
     {
-        public double[,] pixels;
+        public float[,] pixels;
 
         public object Clone()
         {
@@ -26,22 +30,22 @@ namespace IO_projekt
 
         public MyImage(MyImage myImage)
         {
-            pixels = new double[myImage.getWidth(), myImage.getHeight()];
+            pixels = new float[myImage.pixels.GetLength(0), myImage.pixels.GetLength(1)];
             Array.Copy(myImage.pixels, 0, pixels, 0, myImage.pixels.Length);
         }
         public MyImage(Image<Gray, Byte> image)
         {
-            pixels = new double[image.Width, image.Height];
+            pixels = new float[image.Width, image.Height];
             for (int i = 0; i < image.Width; i++)
             for (int j = 0; j < image.Height; j++)
-                pixels[i, j] = image[i,j].Intensity;
+                pixels[i, j] = (float)image[i,j].Intensity;
         }
 
         public void genereateRandomImage(int width, int height)
         {
             width += 2;
             height += 2;
-            pixels = new double[width, height];
+            pixels = new float[width, height];
             int color = 255;
             for (int i = 1; i < height  - 1 ; i++)
             {
@@ -50,7 +54,6 @@ namespace IO_projekt
                     pixels[i, j] = color;
                     if (j % 8 == 0)
                     {
-                      //  Console.WriteLine("i: " + i + " j: " + j);
                         if (color == 255)
                             color = 0;
                         else color = 255;
@@ -59,7 +62,6 @@ namespace IO_projekt
                 }
                 if (i % 8 == 0)
                 {
-                    if(i==1||i==2) Console.WriteLine("dfsddf");
                     if (color == 255)
                         color = 0;
                    else color = 255;
@@ -79,26 +81,6 @@ namespace IO_projekt
             return resultImage;
         }
 
-        public double getPixel(int width, int height)
-        {
-            return pixels[width, height];
-        }
-
-        public void setPixel(int width, int height, double value)
-        {
-            pixels[width, height] = value;
-        }
-
-        public int getWidth()
-        {
-            return pixels.GetLength(0);
-        }
-
-        public int getHeight()
-        {
-            return pixels.GetLength(1);
-        }
-
         public void saveAsPGM(String path)
         {
             var stream = File.Open(path, FileMode.OpenOrCreate);
@@ -114,10 +96,6 @@ namespace IO_projekt
             {
                 for (int j = 1; j < pixels.GetLength(1)-1 ; j++)
                 {
-                    /*if (pixels[i,j] - (int)pixels[i,j] < 0.5)
-                        sb = sb.Append((int)pixels[i, j]);
-                    else
-                        sb = sb.Append((int)pixels[i, j] + 1);*/
                     sb = sb.Append(Math.Floor(pixels[i, j]));
                     sb = sb.Append(" ");
                 }
