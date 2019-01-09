@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,12 +39,34 @@ namespace IO_projekt
 
         public void genereateRandomImage(int width, int height)
         {
-            pixels = new double[width+2, height+2];
-            Random rnd = new Random();
-            for (int i = 1; i < width - 1; i++)
-            for (int j = 1; j < height - 1; j++)
-                pixels[i, j] = rnd.Next(0, 255);
-                //pixels[i, j] = 255;
+            width += 2;
+            height += 2;
+            pixels = new double[width, height];
+            int color = 255;
+            for (int i = 1; i < height  - 1 ; i++)
+            {
+                for (int j = 1; j < width - 1 ; j++)
+                {
+                    pixels[i, j] = color;
+                    if (j % 8 == 0)
+                    {
+                      //  Console.WriteLine("i: " + i + " j: " + j);
+                        if (color == 255)
+                            color = 0;
+                        else color = 255;
+                    }
+
+                }
+                if (i % 8 == 0)
+                {
+                    if(i==1||i==2) Console.WriteLine("dfsddf");
+                    if (color == 255)
+                        color = 0;
+                   else color = 255;
+                }
+
+            }
+
         }
 
         public Image<Gray, Byte> toImage()
@@ -87,9 +110,9 @@ namespace IO_projekt
             sb = sb.Append(pixels.GetLength(1)-2);
             sb = sb.Append("\n");
             sb = sb.Append("255\n");
-            for (int i = 1; i < pixels.GetLength(0) - 2; i++)
+            for (int i = 1; i < pixels.GetLength(0)-1 ; i++)
             {
-                for (int j = 1; j < pixels.GetLength(1) - 2; j++)
+                for (int j = 1; j < pixels.GetLength(1)-1 ; j++)
                 {
                     /*if (pixels[i,j] - (int)pixels[i,j] < 0.5)
                         sb = sb.Append((int)pixels[i, j]);

@@ -14,8 +14,8 @@
         <Label Content="Szerokość (px):" HorizontalAlignment="Left" Margin="30,98,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
         <Label Content="Wysokość (px):" HorizontalAlignment="Left" Margin="30,133,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
         <Label Content="Ilość iteracji:" HorizontalAlignment="Left" Margin="30,168,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
-        <TextBox x:Name="textBox_width" HorizontalAlignment="Left" Height="23" Margin="162,104,0,0" TextWrapping="Wrap" Text="1024" VerticalAlignment="Top" Width="120" FontSize="16"/>
-        <TextBox x:Name="textBox_height" HorizontalAlignment="Left" Height="23" Margin="162,139,0,0" TextWrapping="Wrap" Text="1024" VerticalAlignment="Top" Width="120" FontSize="16"/>
+        <TextBox x:Name="textBox_width" HorizontalAlignment="Left" Height="23" Margin="162,104,0,0" TextWrapping="Wrap" Text="1024" VerticalAlignment="Top" Width="120" FontSize="16" IsReadOnly="True"/>
+        <TextBox x:Name="textBox_height" HorizontalAlignment="Left" Height="23" Margin="162,139,0,0" TextWrapping="Wrap" Text="1024" VerticalAlignment="Top" Width="120" FontSize="16" IsReadOnly="True"/>
         <TextBox x:Name="textBox_iterations" HorizontalAlignment="Left" Height="23" Margin="162,171,0,0" TextWrapping="Wrap" Text="200" VerticalAlignment="Top" Width="120" FontSize="16"/>
         <Button x:Name="button_start" Content="Start" HorizontalAlignment="Left" Margin="30,240,0,0" VerticalAlignment="Top" Width="252" Height="46" FontSize="16" FontWeight="Bold" Click="button_start_Click"/>
         <Label Content="Czas" HorizontalAlignment="Left" Margin="28,350,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="20" Width="252" HorizontalContentAlignment="Center"/>
@@ -30,7 +30,7 @@
         <Button x:Name="button_Start2" Content="Button" HorizontalAlignment="Left" Margin="60,481,0,0" VerticalAlignment="Top" Width="139" Height="59" Click="button_Start2_Click"/>
         <Button x:Name="button_GenerateImage" Content="Generuj obraz" HorizontalAlignment="Left" Margin="30,52,0,0" VerticalAlignment="Top" Width="128" Height="41" Click="button_GenerateImage_Click"/>
         <Label Content="Ilość tasków:" HorizontalAlignment="Left" Margin="30,205,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
-        <TextBox x:Name="textBox_tasksCount" HorizontalAlignment="Left" Height="23" Margin="162,208,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Width="120" FontSize="16"/>
+        <TextBox x:Name="textBox_tasksCount" HorizontalAlignment="Left" Height="23" Margin="162,208,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Width="120" FontSize="16" IsReadOnly="True"/>
 
     </Grid>
 </Window>
