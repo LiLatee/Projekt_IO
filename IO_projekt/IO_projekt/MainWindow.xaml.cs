@@ -28,35 +28,54 @@ namespace IO_projekt
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MyImage randomImage, workingImage;
-        public float[,] workingImage2;
-
         private int countOfIterations;
-        private int width, height;
-        private float[,] tempImage;
+        private int size;
 
         public MainWindow()
         {
+
             InitializeComponent();
-            generateImage();
+
+            randomImageFloat = new MyImageFloat(size, size);
+            randomImageDouble = new MyImageDouble(size, size);
+
+            generateChessboardImage();
         }
 
-        private void generateImage()
+        private void generateRandomImage()
         {
             // generate image
-            width = Int32.Parse(textBox_width.Text);
-            height = Int32.Parse(textBox_height.Text);
+            size = Int32.Parse(textBox_size.Text);
 
-            randomImage = new MyImage(width, height);
-            imageBox_generated.Source = BitmapSourceConvert.ToBitmapSource(randomImage.toImage());
+            randomImageFloat.genereateRandomImage(size, size);
+            randomImageDouble.genereateRandomImage(size, size);
+
+            imageBox_generated.Source = BitmapSourceConvert.ToBitmapSource(randomImageFloat.toImage());
             //randomImage.toImage().Save("generated_image.pgm");
-            randomImage.saveAsPGM("generatedImage.pgm");
+            randomImageFloat.saveAsPGM("generatedImage.pgm");
 
         }
+
+        private void generateChessboardImage()
+        {
+            // generate image
+            size = Int32.Parse(textBox_size.Text);
+
+            randomImageFloat.genereateChessboard(size, size);
+            randomImageDouble.genereateChessboard(size, size);
+
+            imageBox_generated.Source = BitmapSourceConvert.ToBitmapSource(randomImageFloat.toImage());
+            //randomImage.toImage().Save("generated_image.pgm");
+            randomImageFloat.saveAsPGM("generatedImage.pgm");
+
+        }
+
+        private MyImageDouble randomImageDouble;
         private void button_start_Click(object sender, RoutedEventArgs e)
         {
-            workingImage = new MyImage(randomImage);
-            tempImage = new float[width + 2, height + 2];
+            
+            MyImageDouble workingImage = new MyImageDouble(randomImageDouble);
+            MyImageDouble tempImageObj = new MyImageDouble(size + 2, size +2);
             countOfIterations = Int32.Parse(textBox_iterations.Text);
 
             //convolution
@@ -64,15 +83,14 @@ namespace IO_projekt
             stopwatch.Start();
             for (int k = 0; k < countOfIterations; k++)
             {
-                for (int i = 1; i < workingImage.pixels.GetLength(0) - 1; i++)
-                    for (int j = 1; j < workingImage.pixels.GetLength(1) - 1; j++)
+                for (int j = 1; j < workingImage.getHeight() - 1; j++)
+                    for (int i = 1; i < workingImage.getWidth() - 1; i++)
                     {
-                        float newValue = workingImage.pixels[i, j] * 0.6f + workingImage.pixels[i, j - 1] * 0.1f + workingImage.pixels[i, j + 1] * 0.1f +
-                                          workingImage.pixels[i - 1, j] * 0.1f + workingImage.pixels[i + 1, j] * 0.1f;
-
-                        tempImage[i, j] = newValue;
+                        tempImageObj.setPixel(i, j, workingImage.getPixel(i + 1, j) * 0.1 + workingImage.getPixel(i, j - 1) * 0.1 + workingImage.getPixel(i - 1, j) * 0.1 + workingImage.getPixel(i, j + 1) * 0.1 +
+                                                    workingImage.getPixel(i, j) * 0.6);
                     }
-                workingImage.pixels = tempImage;
+                MyImageDouble temp = new MyImageDouble(tempImageObj);
+                workingImage = temp;
             }
             stopwatch.Stop();
             textBlock_synchronous_time.Text = (stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s";
@@ -104,13 +122,17 @@ namespace IO_projekt
             }
         }
 
+        private MyImageFloat randomImageFloat, workingImage;
+        public float[,] workingImageStaticArray;
+        private float[,] tempImage;
+
         private async void button_Start2_Click(object sender, RoutedEventArgs e)
         {
             countOfIterations = Int32.Parse(textBox_iterations.Text);
-            int tasksCount = 8;
-            workingImage = new MyImage(randomImage);
-            tempImage = new float[width + 2, height + 2];
-            workingImage2 = workingImage.pixels;
+            int tasksCount = Int32.Parse(textBox_tasksCount.Text); ;
+            workingImage = new MyImageFloat(randomImageFloat);
+            tempImage = new float[size + 2, size + 2];
+            workingImageStaticArray = workingImage.pixels;
             int mod = (workingImage.pixels.GetLength(1) - 2) % tasksCount;
             int howManyRows = (workingImage.pixels.GetLength(1) - 2) / tasksCount;
 
@@ -119,7 +141,7 @@ namespace IO_projekt
             stopwatch.Start();
             var tasks = new List<Task>();
 
-           for (int k = 0; k < countOfIterations; k++)
+            for (int k = 0; k < countOfIterations; k++)
             {
                 for (int j = 0; j < tasksCount; j++)
                 {
@@ -129,38 +151,15 @@ namespace IO_projekt
                         tasks.Add(ciach1(j * howManyRows + 1, howManyRows));
                 }
                 await Task.WhenAll(tasks.ToArray());
-                workingImage2 = tempImage;
+                workingImageStaticArray = tempImage;
 
             }
             stopwatch.Stop();
-            Console.WriteLine((stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s");
-            workingImage.pixels = workingImage2;
+            workingImage.pixels = workingImageStaticArray;
             textBlock_asynchronous_time.Text = (stopwatch.ElapsedMilliseconds / 1000.0).ToString() + " s";
             imageBox_after_convolution.Source = BitmapSourceConvert.ToBitmapSource(workingImage.toImage());
             //workingImage.toImage().Save("image_after_asynchronous.pgm");
             workingImage.saveAsPGM("image_after_asynchronous.pgm");
-
-        }
-
-        private Task ciach2(int j, int howManyRows)
-        {
-            return Task.Factory.StartNew(() =>
-            {
-
-
-                for (int h = j; h < j + howManyRows && h < workingImage.pixels.GetLength(0) - 1; h++)
-                {
-                    for (int i = 1; i < workingImage.pixels.GetLength(0) - 1; i++)
-                    {
-                        float newValue = workingImage.pixels[i, h] * 0.6f +
-                                         (workingImage.pixels[i, h - 1] + workingImage.pixels[i - 1, h] +
-                                          workingImage.pixels[i + 1, h] + workingImage.pixels[i, h + 1]) * 0.1f;
-
-                        tempImage[i, h] = newValue;
-
-                    }
-                }
-            });
 
         }
 
@@ -169,31 +168,36 @@ namespace IO_projekt
         {
             return Task.Factory.StartNew(() =>
             {
-                float[] newValue = new float[1024];
+                float[] newValue = new float[size];
                 int i;
-                for (int h = j; h < j + howManyRows && h < 1026 - 1; h++)
+                for (int h = j; h < j + howManyRows && h < size - 2 - 1; h++)
                 {
-                    
-                    for (i = 1; i < 1026 - 1; i++)
+
+                    for (i = 1; i < size - 2 - 1; i++)
                     {
-                        newValue[i-1] = workingImage2[h, i] * 0.6f + (workingImage2[h-1, i] + workingImage2[h,i - 1] +
-                                          workingImage2[h,i + 1] + workingImage2[ h + 1,i]) * 0.1f;                       
+                        newValue[i - 1] = workingImageStaticArray[h, i] * 0.6f + (workingImageStaticArray[h - 1, i] + workingImageStaticArray[h, i - 1] +
+                                          workingImageStaticArray[h, i + 1] + workingImageStaticArray[h + 1, i]) * 0.1f;
                     }
 
-                    for (i = 1; i < 1026 - 1; i++)
+                    for (i = 1; i < size - 2 - 1; i++)
                     {
-                        tempImage[h, i] = newValue[i-1];
+                        tempImage[h, i] = newValue[i - 1];
                     }
-
 
                 }
             });
 
         }
 
-        private void button_GenerateImage_Click(object sender, RoutedEventArgs e)
+        private void button_GenerateRandomImage_Click(object sender, RoutedEventArgs e)
         {
-            generateImage();
+            generateRandomImage();
+        }
+
+
+        private void button_GenerateChessboardImage_Click(object sender, RoutedEventArgs e)
+        {
+            generateChessboardImage();
         }
     }
 }

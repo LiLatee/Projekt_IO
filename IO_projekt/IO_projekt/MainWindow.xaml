@@ -5,32 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IO_projekt"
         mc:Ignorable="d"
-        Title="Projekt Inżynieria Oprogramowania" Height="600" Width="1200" ResizeMode="NoResize">
+        Title="Projekt Inżynieria Oprogramowania" Height="700" Width="1200" ResizeMode="NoResize">
     <Grid>
         <Image x:Name="imageBox_generated" HorizontalAlignment="Left" Height="400" Margin="314,96,0,0" VerticalAlignment="Top" Width="400"/>
         <Image x:Name="imageBox_after_convolution" Height="400" Margin="760,95,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="400"/>
         <Label Content="Wygenerowany obraz" HorizontalAlignment="Left" Margin="314,36,0,0" VerticalAlignment="Top" Height="35" Width="239" FontSize="16"/>
         <Label Content="Obraz po konwolucji" HorizontalAlignment="Left" Margin="760,36,0,0" VerticalAlignment="Top" Height="35" Width="239" FontSize="16"/>
-        <Label Content="Szerokość (px):" HorizontalAlignment="Left" Margin="30,98,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
-        <Label Content="Wysokość (px):" HorizontalAlignment="Left" Margin="30,133,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
-        <Label Content="Ilość iteracji:" HorizontalAlignment="Left" Margin="30,168,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
-        <TextBox x:Name="textBox_width" HorizontalAlignment="Left" Height="23" Margin="162,104,0,0" TextWrapping="Wrap" Text="1024" VerticalAlignment="Top" Width="120" FontSize="16" IsReadOnly="True"/>
-        <TextBox x:Name="textBox_height" HorizontalAlignment="Left" Height="23" Margin="162,139,0,0" TextWrapping="Wrap" Text="1024" VerticalAlignment="Top" Width="120" FontSize="16" IsReadOnly="True"/>
-        <TextBox x:Name="textBox_iterations" HorizontalAlignment="Left" Height="23" Margin="162,171,0,0" TextWrapping="Wrap" Text="200" VerticalAlignment="Top" Width="120" FontSize="16"/>
-        <Button x:Name="button_start" Content="Start" HorizontalAlignment="Left" Margin="30,240,0,0" VerticalAlignment="Top" Width="252" Height="46" FontSize="16" FontWeight="Bold" Click="button_start_Click"/>
-        <Label Content="Czas" HorizontalAlignment="Left" Margin="28,350,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="20" Width="252" HorizontalContentAlignment="Center"/>
-        <Label Content="Synchronicznie:" HorizontalAlignment="Left" Margin="28,392,0,0" VerticalAlignment="Top" FontSize="16" HorizontalContentAlignment="Right" Width="128" Height="32"/>
-        <Label Content="Asynchronicznie:" HorizontalAlignment="Left" Margin="28,429,0,0" VerticalAlignment="Top" FontSize="16" HorizontalContentAlignment="Right" Height="32"/>
-        <Border Height="32"  Width="100" Margin="180,392,913.6,146.4">
+        <Label Content="Rozmiar (px):" HorizontalAlignment="Left" Margin="30,98,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
+        <Label Content="Ilość iteracji:" HorizontalAlignment="Left" Margin="30,137,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
+        <TextBox x:Name="textBox_size" HorizontalAlignment="Left" Height="23" Margin="162,104,0,0" TextWrapping="Wrap" Text="1024" VerticalAlignment="Top" Width="120" FontSize="16"/>
+        <TextBox x:Name="textBox_iterations" HorizontalAlignment="Left" Height="23" Margin="162,140,0,0" TextWrapping="Wrap" Text="200" VerticalAlignment="Top" Width="120" FontSize="16"/>
+        <Button x:Name="button_start" Content="Wykonaj bez optymalizcji" HorizontalAlignment="Left" Margin="30,209,0,0" VerticalAlignment="Top" Width="252" Height="46" FontSize="14" FontWeight="Bold" Click="button_start_Click"/>
+        <Label Content="Czas" HorizontalAlignment="Left" Margin="28,328,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="20" Width="252" HorizontalContentAlignment="Center"/>
+        <Label Content="Bez optymalizacji:" HorizontalAlignment="Left" Margin="28,370,0,0" VerticalAlignment="Top" FontSize="16" HorizontalContentAlignment="Right" Width="135" Height="32"/>
+        <Label Content="Z optymalizacją:" HorizontalAlignment="Left" Margin="28,407,0,0" VerticalAlignment="Top" FontSize="16" HorizontalContentAlignment="Right" Height="32" Width="135"/>
+        <Border Height="32"  Width="100" Margin="181,372,912.6,266.4">
             <TextBlock x:Name="textBlock_synchronous_time" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="16"><Run Text="0.0 s"/></TextBlock>
         </Border>
-        <Border Height="32"  Width="100" Margin="180,429,913.6,109.4">
+        <Border Height="32"  Width="100" Margin="181,409,912.6,229.4">
             <TextBlock x:Name="textBlock_asynchronous_time" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="16"> <Run Text="0.0 s"/></TextBlock>
         </Border>
-        <Button x:Name="button_Start2" Content="Button" HorizontalAlignment="Left" Margin="60,481,0,0" VerticalAlignment="Top" Width="139" Height="59" Click="button_Start2_Click"/>
-        <Button x:Name="button_GenerateImage" Content="Generuj obraz" HorizontalAlignment="Left" Margin="30,52,0,0" VerticalAlignment="Top" Width="128" Height="41" Click="button_GenerateImage_Click"/>
-        <Label Content="Ilość tasków:" HorizontalAlignment="Left" Margin="30,205,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
-        <TextBox x:Name="textBox_tasksCount" HorizontalAlignment="Left" Height="23" Margin="162,208,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Width="120" FontSize="16" IsReadOnly="True"/>
+        <Button x:Name="button_Start2" Content="Wykonaj z optymalizcją" HorizontalAlignment="Left" Margin="30,271,0,0" VerticalAlignment="Top" Width="252" Height="46" Click="button_Start2_Click" FontWeight="Bold" FontSize="14"/>
+        <Button x:Name="button_GenerateImage" Content="Generuj losowy" HorizontalAlignment="Left" Margin="30,52,0,0" VerticalAlignment="Top" Width="114" Height="41" Click="button_GenerateRandomImage_Click"/>
+        <Label Content="Ilość tasków:" HorizontalAlignment="Left" Margin="30,174,0,0" VerticalAlignment="Top" Height="30" Width="114" FontSize="16"/>
+        <TextBox x:Name="textBox_tasksCount" HorizontalAlignment="Left" Height="23" Margin="162,177,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Width="120" FontSize="16"/>
+        <Button x:Name="button_GenerateChessboardImage" Content="Generuj szachownicę" HorizontalAlignment="Left" Margin="168,52,0,0" VerticalAlignment="Top" Width="114" Height="41" Click="button_GenerateChessboardImage_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="30,517,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="116" Width="610"><Run FontWeight="Bold" Text="OPTYMALIZACJA OBEJMUJE"/><Run Text=":"/><LineBreak/><Run Text="- użycie typu float zamiast double (wartości mniejszego typu więcej zmieści się w pamięci cache cpu),"/><LineBreak/><Run Text="- brak używania metod do przypisywania i pobierania danych (bezpośrednie odwołania),"/><LineBreak/><Run Text="- pobieranie danych z tablic w kolejności najlepiej wykorzystującej pamięć cache cpu,"/><LineBreak/><Run Text="- w podwójnych pętlach działających na tablicach, wewnętrzna pętla iteruje po kolumnach (drugi indeks tablicy),"/><LineBreak/><Run Text="- pętla zawierająca więcej operacji została rozdzielona na 2 osobne pętle, aby lepiej wykorzystać pamięć cache cpu,"/><LineBreak/><Run Text="- praca wielowątkowa,"/></TextBlock>
+
 
     </Grid>
 </Window>
